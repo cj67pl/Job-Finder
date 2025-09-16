@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Look Up</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    
+</head>
+<body>
+
+    <nav>
+        <ul>
+            <li><a href="/" class="site-name"><h1>Job Look Up</h1></a></li>
+            <!-- <li ><a class="nav-btn" href="#">Explore Job</a></li> -->
+            <li ><a class="nav-btn" href="/saved">Saved Jobs</a></li>
+        </ul>   
+        <form action="/search" method="get" class="nav-search-grp">
+    
+            <!-- <div class="">
+                
+                <select class="category" name="category" id="category">
+                    <option value="cat1">Category 1</option>
+                    <option value="cat2">Category 2</option>
+                    <option value="cat3">Category 3</option>
+                </select>
+            </div> -->
+
+            <div class="search-grp">
+                <input type="text" name="q" placeholder="Search for Jobs">
+                <button type="submit"><img src="/images/search-icon.png" alt="Search"></button>
+            </div>
+        </form>
+
+        
+    </nav>
+
+
+<% if(locals.jobs) { %>
+
+    <!-- Shows lists of jobs after searching -->
+    <div class="jobs-container">
+
+        <div class="job-list-cont">
+            <h3>Search Results: </h3>
+
+<%  jobs.forEach((job) => { %>
+
+
+            <div class="job <%= selectedJob && selectedJob.id === job.id ? 'selected-job' : '' %>">
+                <div class="job-title-cont">
+                    <div class="logo">
+                    <% if(job.logo){ %>
+                        <img src="<%= job.logo %>" alt="Company logo" class="company-logo">
+                    <% } else { %>
+                        <div class="logo-alternative"><%= job.logo_alt %></div>
+                    <% } %>
+                    </div>
+                    <div class="title-address-cont">
+                        <div class="job-title">
+                            <h4><%= job.title %></h4>
+                        </div>
+
+                        <div class="job-address">
+                            <p class="company-name"><%= job.company %></p>
+                            <p class="address"><%= job.location %></p>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="info">
+                    <p class="sched"><%= job.sched %></p>
+                    <div class="more nav-search-grp ">
+                        <form action="/<%= currentRoute %>" method="get">
+                            <input type="hidden" name="id" value="<%= job.id %>">
+                            <button type="submit">Read More</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+<% }); %>
+        </div>
+
+
+
+           
+        <!-- For the information about the Job -->
+
+        <div class="job-details-cont">
+            
+            
+
+    <% if (selectedJob) {%>            
+            
+            <% if(selectedJob.logo){ %>
+                <img src="<%= selectedJob.logo %>" alt="Company logo" class="company-logo">
+            <% } else { %>
+                <div class="logo-alternative">
+                    <%= selectedJob.logo_alt %>
+                </div>
+            <% } %>
+
+            <h3><%= selectedJob.title %></h3>
+            <a href="" class="comp-name"><%= selectedJob.company %></a>
+            <div class="minor-details">
+                <div class="mn-cont">
+                    <div>
+                        <img class="location" src="/images/loc.png" alt="">
+                    </div>
+                    <span><%= selectedJob.location %></span>
+                </div>
+                <div class="mn-cont">
+                    <div>
+                        <img class="clock" src="/images/clock.png" alt="">
+                    </div>
+                    <span>
+                        <%= selectedJob.arrangement %>
+                    </span>
+                </div>
+                <div class="mn-cont">
+                    <div>
+                        <img class="money" src="/images/money.png" alt="">
+                    </div>
+                    <span><%= selectedJob.salary %></span>
+                </div>
+                <div class="date-post">
+                    <span><%= selectedJob.postDate %></span>
+                    <form action="/save" method="POST">
+                        <input type="hidden" name="id" value="<%= selectedJob.id %>">
+                        <input type="hidden" name="from" value="<%= currentRoute %>">
+                        <button class="save-btn" type="submit">
+                            <img class="save-img"
+                                src="<%= savedJobs.some(j => j.id === selectedJob.id) ? '/images/saved.png' : '/images/save.png' %>" alt="Save">
+                        </button>
+
+                    </form>
+
+
+                </div>
+            </div>
+            <div class="position-summary">
+                <h4>Position Summary: </h4>
+                <p>
+                    <%= selectedJob.description %>
+                </p>
+            </div>
+
+        <% if(selectedJob.qualifications && selectedJob.qualifications.length> 0) { %>
+            <div class="required-qual">
+                <h4>Required Qualifications: </h4>
+                <ul>
+                <% selectedJob.qualifications.forEach(qual => { %>
+                    <li><%= qual %></li>
+                <% }); %>
+                </ul>
+            
+            </div>
+        <% } %>
+
+        <% if(selectedJob.benefits && selectedJob.benefits.length > 0) { %>
+            <div class="benefits">
+                <h4>Benefits: </h4>
+                <ul>
+                <% selectedJob.benefits.forEach(benefit => { %> 
+                    <li><%= benefit %></li>
+                <% }); %>
+                </ul>
+            
+            </div>
+        <%  } %>
+
+        <% if(selectedJob.responsibilities && selectedJob.responsibilities.length> 0) { %>
+            <div class="responsibilities">
+                <h4>Key Responsibilities: </h4>
+                <ul>
+                <% selectedJob.responsibilities.forEach(resp => { %> 
+                    <li><%= resp %>
+                    </li>
+
+                <% }); %>
+                    
+
+                </ul>
+
+            </div>
+        <% } %>
+
+        <% if(selectedJob.apply_opts && selectedJob.apply_opts.length> 0) { %>
+            <div>
+                <h4>Apply Options:</h4>
+                <ul>
+                <% selectedJob.apply_opts.forEach(apply => { %>
+                    <li class="job-link"><a href="<%= apply.link %>">
+                        <%= apply.title %>
+                    </a></li>
+                <% }); %>
+                    
+                </ul>
+            </div>
+        </div>
+        <% } %>
+
+    </div>
+    <% } else { %> 
+        <h4>Select job to show details...</h4>
+    <% } %>
+
+</div>
+
+
+<% } else {%>
+
+
+    <div class="main-container">
+        <div class="tagline-cont">
+            <section class="tagline">
+                <h2>Work Smarter, Dream Bigger</h2>
+                <p>Browse jobs tailored to your skills and goals.</p>
+            </section>
+            
+            <form action="/search" method="get" class="nav-search-grp ">
+                <div class="search-grp sg-larger">
+                    <input type="text" name="q" placeholder="Search for Jobs">
+                    <button type="submit"><img src="/images/search-icon.png" alt="Search"></button>
+                </div>
+            </form>
+        </div>
+
+<% } %>
+
+
+
+
+
+
+
+    <script>
+        const slider = document.getElementById("points");
+        const output = document.getElementById("currentValue");
+
+        // Update the output display when the slider value changes
+        slider.oninput = function () {
+            output.innerHTML = this.value;
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const selected = document.querySelector(".selected-job");
+            if (selected) {
+                selected.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        });
+    </script>
+
+</body>
+</html>
